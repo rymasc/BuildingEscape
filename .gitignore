@@ -6,3 +6,6 @@ Saved/
 
 *.db
 .vs/BuildingEscape/v15/
+*.suo
+*.sln
+*.VC.opendb
