@@ -36,4 +36,6 @@ private:
 	void verifyPhysicsComponent();
 	//return hit for first physics body in reach
 	const FHitResult GetPhysicsBody();
+	FVector getEndOfReach();
+	FVector getPlayerLocation();
 };

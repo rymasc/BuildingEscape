@@ -46,14 +46,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (physicsHandle->GrabbedComponent) {
-		APlayerController* player = GetWorld()->GetFirstPlayerController();
-		FVector playerLocation;
-		FRotator playerRotation;
-		player->GetPlayerViewPoint(playerLocation, playerRotation);
-
-
-		FVector lineOfSight = playerLocation + playerRotation.Vector()*Reach;
-		physicsHandle->SetTargetLocation(lineOfSight);
+		physicsHandle->SetTargetLocation(getEndOfReach());
 	}
 
 
@@ -61,9 +54,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 void UGrabber::verifyPhysicsComponent() {
 	physicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (physicsHandle) {
-		UE_LOG(LogTemp, Warning, TEXT("Found physics handle component"));
-	} else {
+	if (physicsHandle == nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("%s is missing physics handle component"), *GetOwner()->GetName());
 	}
 
@@ -71,20 +62,14 @@ void UGrabber::verifyPhysicsComponent() {
 
 const FHitResult UGrabber::GetPhysicsBody() {
 
-	APlayerController* player = GetWorld()->GetFirstPlayerController();
-	FVector playerLocation;
-	FRotator playerRotation;
-	player->GetPlayerViewPoint(playerLocation, playerRotation);
 
-	
-	FVector lineOfSight = playerLocation + playerRotation.Vector()*Reach;
 	FHitResult hit;
 
 	FCollisionQueryParams traceParams(FName(TEXT("")), false, GetOwner());
 
 	GetWorld()->LineTraceSingleByObjectType(hit,
-		playerLocation,
-		lineOfSight,
+		getPlayerLocation(),
+		getEndOfReach(),
 		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 		traceParams
 	);
@@ -96,10 +81,27 @@ const FHitResult UGrabber::GetPhysicsBody() {
 	return hit;
 }
 
+FVector UGrabber::getEndOfReach() {
+	APlayerController* player = GetWorld()->GetFirstPlayerController();
+	FVector playerLocation;
+	FRotator playerRotation;
+	player->GetPlayerViewPoint(playerLocation, playerRotation);
+
+
+	return playerLocation + playerRotation.Vector()*Reach;
+}
+
+FVector UGrabber::getPlayerLocation() {
+	APlayerController* player = GetWorld()->GetFirstPlayerController();
+	FVector playerLocation;
+	FRotator playerRotation;
+	player->GetPlayerViewPoint(playerLocation, playerRotation);
+	return playerLocation;
+}
+
 void UGrabber::setupInputComponent() {
 	inputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	if (inputComponent) {
-		UE_LOG(LogTemp, Warning, TEXT("Input component found"));
 		inputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		inputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 	} else {
