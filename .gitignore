@@ -1,6 +1,7 @@
 Intermediate/
 Binaries/
-Content/StarterContent/
+Content/StarterContent/Textures
+Content/StarterContent/HDRI
 Saved/
 
 *.db
