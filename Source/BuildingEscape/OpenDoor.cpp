@@ -60,6 +60,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 float UOpenDoor::getTotalMassOnPlate() {
 	float totalMass = 0.f;
 	TArray<AActor*> overlappingActors;
+	if (!pressurePlate) return totalMass;
 	pressurePlate->GetOverlappingActors(overlappingActors);
 	for (AActor* actor : overlappingActors) {
 		totalMass += actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
